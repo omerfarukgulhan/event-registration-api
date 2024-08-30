@@ -1,1 +1,1 @@
-# event-registration-api
+# event-registration-app
