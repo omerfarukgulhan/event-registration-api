@@ -12,7 +12,6 @@ var DB *sql.DB
 func InitDB() {
 	var err error
 	connString := "postgres://postgres:153515@localhost:5432/workshops"
-
 	DB, err = sql.Open("pgx", connString)
 	if err != nil {
 		log.Fatalf("Could not connect to the PostgreSQL database: %v\n", err)
@@ -20,7 +19,6 @@ func InitDB() {
 
 	DB.SetMaxOpenConns(10)
 	DB.SetMaxIdleConns(5)
-
 	if err = DB.Ping(); err != nil {
 		log.Fatalf("Could not ping the PostgreSQL database: %v\n", err)
 	}
