@@ -3,8 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"log"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 var DB *sql.DB
@@ -57,6 +58,21 @@ func createTables() {
 	_, err = DB.Exec(createEventsTable)
 	if err != nil {
 		log.Fatalf("Could not create events table: %v\n", err)
+	}
+
+	createRegistrationsTable := `
+	CREATE TABLE IF NOT EXISTS registrations (
+		id SERIAL PRIMARY KEY,
+		event_id INTEGER,
+		user_id INTEGER,
+		FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,
+		FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+	)
+	`
+
+	_, err = DB.Exec(createRegistrationsTable)
+	if err != nil {
+		log.Fatalf("Could not create registrations table: %v\n", err)
 	}
 
 	fmt.Println("Tables created or already exist.")

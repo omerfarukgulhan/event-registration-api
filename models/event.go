@@ -25,6 +25,7 @@ func (event *Event) Save() error {
 	if err != nil {
 		return err
 	}
+
 	defer stmt.Close()
 	result, err := stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserID)
 	if err != nil {
@@ -81,22 +82,46 @@ func (event Event) Update() error {
 	}
 
 	defer stmt.Close()
-
 	_, err = stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.ID)
+
 	return err
 }
 
 func (event Event) Delete() error {
 	query := `DELETE FROM events WHERE id = $1`
-
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
 		return err
 	}
 
 	defer stmt.Close()
-
 	_, err = stmt.Exec(event.ID)
+
+	return err
+}
+
+func (event Event) Register(userId int64) error {
+	query := "INSERT INTO registrations(event_id, user_id) VALUES (?, ?)"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+	_, err = stmt.Exec(event.ID, userId)
+
+	return err
+}
+
+func (event Event) CancelRegistration(userId int64) error {
+	query := "DELETE FROM registrations WHERE event_id = ? AND user_id = ?"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+	_, err = stmt.Exec(event.ID, userId)
 
 	return err
 }

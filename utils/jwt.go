@@ -3,8 +3,9 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 const secretKey = "supersecret"
@@ -47,7 +48,6 @@ func VerifyToken(token string) (int64, error) {
 		return 0, errors.New("Invalid token claims.")
 	}
 
-	// email := claims["email"].(string)
 	userId := int64(claims["userId"].(float64))
 	return userId, nil
 }
