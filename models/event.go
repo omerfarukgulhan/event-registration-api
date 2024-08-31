@@ -2,7 +2,6 @@ package models
 
 import (
 	"example.com/event-registration-app/db"
-	"fmt"
 	"time"
 )
 
@@ -12,31 +11,30 @@ type Event struct {
 	Description string    `binding:"required"`
 	Location    string    `binding:"required"`
 	DateTime    time.Time `binding:"required"`
-	UserID      int
+	UserID      int64
 }
 
 var events = []Event{}
 
-func (event Event) Save() error {
+func (event *Event) Save() error {
 	query := `
     INSERT INTO events(name, description, location, dateTime, user_id) 
     VALUES ($1, $2, $3, $4, $5) 
     RETURNING id`
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("error preparing query: %w", err)
+		return err
 	}
-
 	defer stmt.Close()
-
-	err = stmt.QueryRow(event.Name, event.Description, event.Location, event.DateTime, event.UserID).Scan(&event.ID)
+	result, err := stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserID)
 	if err != nil {
-		return fmt.Errorf("error executing query: %w", err)
+		return err
 	}
 
-	return nil
+	id, err := result.LastInsertId()
+	event.ID = id
+	return err
 }
-
 func GetAll() ([]Event, error) {
 	query := "SELECT * FROM events"
 	rows, err := db.DB.Query(query)
